@@ -1,0 +1,14 @@
+{
+  "name": "desktop-youtube-music",
+  "version": "0.0.1",
+  "description": "Desktop port of music.youtube.com",
+  "main": "index.js",
+  "scripts": {
+    "test": "electron index"
+  },
+  "author": "Rowan Hall",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^5.0.2"
+  }
+}

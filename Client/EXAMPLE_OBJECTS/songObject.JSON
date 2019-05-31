@@ -1,0 +1,20 @@
+{
+  "title": "Favorite Sound",
+  "authors": [
+    "// Array of author objects //",
+    {
+      "name": "Echosmith"
+    },
+    {
+      "name": "Audien"
+    }
+  ],
+  "album": [
+    "// Array of album objects //",
+  ],
+  "id": "KxuQrqkILh0",
+  "songLength": 123.4567,
+  "listenedTo": 100.3245,
+  "state": "ONE OF [PAUSED, LOADING, PLAYING]",
+  "icon": "https://lh3.googleusercontent.com/rASvoYjuz2JoF7GBDh6zAPVB26qs2pyGHDepV-JFOOgkB6BLFdgzRVWwPV2yrbp-DAmomZCXZgRQDPtQ=w60-h60-l90-rj",
+}
