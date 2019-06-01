@@ -71,6 +71,7 @@ ipc.on("FOCUS_CHANGE", (event, songObject) => { //FINISHED
 })
 
 ipc.on("UPDATE_ACCOUNT", (event, userObject) => { //FINISHED
+  console.log("UPDATE_ACCOUNT", userObject)
   globalData.googleUser = userObject
 })
 

@@ -24,6 +24,22 @@ const authorStringParser = (authorString) => {
   })
   return returnobjectstage2
 }
+const accountParser = (rawacc) => {
+  var returnobject = {
+    'alts': []
+  };
+  rawacc.forEach(account => {
+    if(account.active) {
+      returnobject.email = account.email
+      returnobject.name = account.name
+      returnobject.photo_url = account.photo_url
+      returnobject.switch_url = account.switch_url
+    } else {
+      returnobject.alts.push(account)
+    }
+  })
+  return returnobject
+}
 
 window.lastSongObject = {}
 window.lastFocusState = false;
@@ -89,4 +105,16 @@ setInterval(() => {
   }
   
   window.lastSongObject = songObject
+  
+  var rawAccounts = yt.config_.ACCOUNTS
+  var parsed = accountParser(rawAccounts)
+  try {
+    if(parsed.email != window.accounts.email) {
+      ipc.send("UPDATE_ACCOUNT", parsed)
+    }
+    window.accounts = parsed
+  } catch(err) {
+    ipc.send("UPDATE_ACCOUNT", parsed)
+    window.accounts = parsed
+  }
 }, 10)
