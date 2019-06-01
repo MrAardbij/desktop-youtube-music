@@ -1,6 +1,14 @@
 const { app, BrowserWindow, session, ipcMain } = require('electron')
 const ipc = ipcMain
 let win
+var globalData = {};
+var d_rpc = require('./DiscordRPCHandler.js')
+var client = d_rpc('582505724693839882');
+var discord = d_rpc.emitter
+
+discord.on('DISPATCH', (data => {
+  globalData.discordUser = data.user
+}))
 function createWindow () {
   win = new BrowserWindow({
     width: 800,
@@ -34,22 +42,37 @@ app.on('window-all-closed', () => {
   app.quit()
 })
 
-ipc.on("UPDATE_RAW", (songObject) => {
-  
+ipc.on("UPDATE_RAW", (event, songObject) => { //FINISHED
+  globalData.currentSong = songObject
 })
 
-ipc.on("SONG_CHANGE", (songObject) => {
+ipc.on("SONG_CHANGE", (event, songObject) => { //FINISHED
   console.log("SONG_CHANGE", songObject)
 })
 
-ipc.on("SCRUB_TO", (songObject) => {
+ipc.on("SCRUB_TO", (event, songObject) => { //FINISHED
   console.log("SCRUB_TO", songObject)
 })
 
-ipc.on("PAUSE", (songObject) => {
+ipc.on("PAUSE", (event, songObject) => { //FINISHED
   console.log("PAUSE", songObject)
 })
 
-ipc.on("PLAY", (songObject) => {
+ipc.on("PLAY", (event, songObject) => { //FINISHED
   console.log("PLAY", songObject)
 })
+
+ipc.on("LOADING", (event, songObject) => { //FINISHED
+  console.log("LOADING", songObject)
+})
+
+ipc.on("FOCUS_CHANGE", (event, songObject) => { //FINISHED
+  console.log("FOCUS_CHANGE", songObject)
+})
+
+ipc.on("UPDATE_ACCOUNT", (event, userObject) => { //FINISHED
+  globalData.googleUser = userObject
+})
+
+//GROUP HANDLING
+

@@ -1,7 +1,8 @@
 const ipc = require('electron').ipcRenderer
 const songStates = [
-  "PLAYING",
-  "PAUSED",
+  "",
+  "PLAY",
+  "PAUSE",
   "LOADING"
 ]
 const authorStringParser = (authorString) => {
@@ -9,9 +10,23 @@ const authorStringParser = (authorString) => {
   var basic = authorString.split(" & ")
   returnobject.push(basic.pop())
   basic = basic[0]
-  var complex = basic.split(", ")
-  return complex.concat(returnobject)
+  if (basic) {
+    var complex = basic.split(", ")
+  } else {
+    var complex = [];
+  }
+  var stage2 = complex.concat(returnobject)
+  var returnobjectstage2 = [];
+  stage2.forEach(stage => {
+    returnobjectstage2.push({
+      "text": stage
+    })
+  })
+  return returnobjectstage2
 }
+
+window.lastSongObject = {}
+window.lastFocusState = false;
 
 document.addEventListener('DOMContentLoaded', function(){ 
   
@@ -30,16 +45,48 @@ setInterval(() => {
   
   //build songObject
   
-  var songObject = {
-    "title": document.getElementsByClassName('style-scope ytmusic-app')[8].__data__.currentItem_.title.runs[0].text,
-    "authors": authorStringParser(document.getElementsByClassName('style-scope ytmusic-app')[8].__data__.currentItem_.shortBylineText.runs[0].text),
-    "album": [
-      "// Array of album objects //",
-    ],
-    "id": _ga_.playerController.playerApi.getVideoData()["video_id"],
-    "songDuration": _ga_.playerController.playerApi.getDuration(),
-    "listenedTo": _ga_.playerController.playerApi.getCurrentTime(),
-    "state": songStates[_ga_.playerController.playerApi.getPlayerState()],
-    "icon": document.getElementsByClassName('style-scope ytmusic-app')[8].__data__.currentItem_.thumbnail.thumbnails[document.getElementsByClassName('style-scope ytmusic-app')[8].__data__.currentItem_.thumbnail.thumbnails.length - 1].url
+  try {
+    var songObject = {
+      "isPlaying": true,
+      "title": document.getElementsByClassName('style-scope ytmusic-app')[8].__data__.currentItem_.title.runs[0].text,
+      "authors": authorStringParser(document.getElementsByClassName('style-scope ytmusic-app')[8].__data__.currentItem_.shortBylineText.runs[0].text),
+      "id": _ga_.playerController.playerApi.getVideoData()["video_id"],
+      "songDuration": _ga_.playerController.playerApi.getDuration(),
+      "listenedTo": _ga_.playerController.playerApi.getCurrentTime(),
+      "state": songStates[_ga_.playerController.playerApi.getPlayerState()],
+      "icon": document.getElementsByClassName('style-scope ytmusic-app')[8].__data__.currentItem_.thumbnail.thumbnails[document.getElementsByClassName('style-scope ytmusic-app')[8].__data__.currentItem_.thumbnail.thumbnails.length - 1].url
+    }
+  } catch(e) {
+    var songObject = {
+      "isPlaying": false
+    }
   }
+  
+  
+  if(window.lastSongObject.state != songObject.state && songObject.state != undefined) {
+    ipc.send(songObject.state, songObject)
+  }
+  
+  // should return 'undefined' if not playing, which won't equal a song name.
+  // do !== rather than != in case the song is called "undefined". fuck whoever does that.
+  
+  if(songObject.title !== window.lastSongObject.title) {
+    ipc.send("SONG_CHANGE", songObject)
+  }
+  ipc.send("UPDATE_RAW", songObject)
+  
+  //check if window is in focus
+  
+  if(window.lastFocusState != document.hasFocus()) {
+    ipc.send("FOCUS_CHANGE", document.hasFocus())
+  }
+  window.lastFocusState = document.hasFocus();
+  
+  //check if we have scrubbed to a different position
+  
+  if(Math.abs(window.lastSongObject.listenedTo-songObject.listenedTo) > 0.05) {
+    ipc.send("SCRUB_TO", songObject)
+  }
+  
+  window.lastSongObject = songObject
 }, 10)
