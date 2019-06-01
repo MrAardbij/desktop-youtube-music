@@ -12,6 +12,7 @@
     "electron": "^5.0.2"
   },
   "dependencies": {
-    "discord-rpc": "^3.0.2"
+    "discord-rpc": "^3.0.2",
+    "randomstring": "^1.1.5"
   }
 }
