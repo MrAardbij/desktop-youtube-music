@@ -4,11 +4,14 @@ var emitter = new events.EventEmitter();
 module.exports = (clientId, scopes) => {
   DiscordRPC.register(clientId);
   const client = new DiscordRPC.Client({ transport: 'ipc' });
-  
+  console.log(client)
   client.transport.on('message', (command) => {
-    console.log(command.cmd, command.data)
     emitter.emit(command.cmd, command.data)
   })
+  
+  client.subscribe('ACTIVITY_JOIN', ({ secret }) => {
+    emitter.emit('join', secret);
+  });
   
   client.on('ready', () => {
     emitter.emit('ready')
